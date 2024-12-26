@@ -1,4 +1,5 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
+import urllib.parse
 
 app = Flask(__name__)
 
@@ -42,6 +43,28 @@ def team():
 @app.route('/testimonial')
 def testimonial():
     return render_template('testimonial.html')
+
+# Route to handle form submission and send message to WhatsApp
+@app.route('/send_whatsapp', methods=['POST'])
+def send_whatsapp():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        subject = request.form['subject']
+        message = request.form['message']
+
+        # Format the message to be sent to WhatsApp
+        whatsapp_number = "7325060600"  # Replace with your WhatsApp Business number
+        whatsapp_message = f"Name: {name}\nEmail: {email}\nSubject: {subject}\nMessage: {message}"
+
+        # URL encode the message
+        whatsapp_message = urllib.parse.quote(whatsapp_message)
+
+        # Create the WhatsApp URL
+        whatsapp_url = f"https://wa.me/{whatsapp_number}?text={whatsapp_message}"
+
+        # Redirect to WhatsApp with the pre-filled message
+        return redirect(whatsapp_url)
 
 if __name__ == '__main__':
     app.run(debug=True)
